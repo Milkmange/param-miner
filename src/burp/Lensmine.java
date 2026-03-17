@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+import java.util.regex.*;
 
 public class Lensmine extends Scan {
 
@@ -337,10 +338,16 @@ public class Lensmine extends Scan {
     static String getTitle(HttpRequestResponse resp) {
         try {
             String body = resp.response().bodyToString();
-            if (!body.contains("<title")) {
-                return "";
+
+            Pattern p = Pattern.compile("<title>(.*?)</title>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+            Matcher m = p.matcher(body);
+
+            if (m.find()) {
+                return m.group(1).trim();
             }
-            return body.split("<title", 1)[1].split(">", 1)[1].split("<")[0];
+
+            return "";
+
         } catch (Exception e) {
             return "";
         }
